@@ -1,0 +1,8 @@
+{
+  "name": "designcomputing/symfony-apicorecontroller",
+  "autoload": {
+	"psr-4": {
+	  "DesignComputing\\Controller\\": "src"
+	}
+  }
+}

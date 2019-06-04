@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace DesignComputing\Controller;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
