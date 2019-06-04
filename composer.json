@@ -1,5 +1,5 @@
 {
-  "name": "designcomputing/symfony-apicorecontroller",
+  "name": "designcomputing5/symfony-apicorecontroller",
   "autoload": {
 	"psr-4": {
 	  "DesignComputing\\Controller\\": "src"
