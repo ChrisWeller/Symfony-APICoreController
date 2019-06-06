@@ -112,6 +112,12 @@ abstract class CoreController extends AbstractController {
 		return $this->_store( $request, $id );
 	}
 
+	/**
+	 * Store the object
+	 * @param Request $request
+	 * @param null $id
+	 * @return JsonResponse
+	 */
 	private function _store( Request $request, $id = null ) {
 
 		if ( $id ) {
@@ -126,17 +132,7 @@ abstract class CoreController extends AbstractController {
 
 		// If the form is valid
 		if ( $form->isValid() ) {
-			// Persist the data
-			$this->em->persist( $object );
-			// Flush the data to the database
-			$this->em->flush();
-
-			// Serialize the whole lot
-			$response_data = $this->serializer->serialize( [ 'status' => 'OK', $this->singluar_name => $object ], 'json', ['groups' => $this->result_group ] );
-
-			// Return success :-)
-			return new JsonResponse( $response_data, 200, [], true );
-			//return new JsonResponse( [ "status" => "OK", $this->singluar_name => $object ] );
+			return $this->_saveObject( $object );
 		}
 		else {
 			$errors = $form->getErrors( true );
@@ -150,13 +146,30 @@ abstract class CoreController extends AbstractController {
 		}
 	}
 
+	/**
+	 * Actually save the object
+	 * @param $object
+	 * @return JsonResponse
+	 */
+	protected function _saveObject( $object ) {
+		// Persist the data
+		$this->em->persist( $object );
+		// Flush the data to the database
+		$this->em->flush();
+
+		// Serialize the whole lot
+		$response_data = $this->serializer->serialize( [ 'status' => 'OK', $this->singluar_name => $object ], 'json', ['groups' => $this->result_group ] );
+
+		// Return success :-)
+		return new JsonResponse( $response_data, 200, [], true );
+	}
 
 	/**
 	 * Get the individual item
 	 * @param $id
 	 * @return mixed
 	 */
-	private function getObject( $id ) {
+	protected function getObject( $id ) {
 		return $this->em->find( $this->object_class, $id );
 	}
 }
