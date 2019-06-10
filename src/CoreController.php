@@ -90,7 +90,7 @@ abstract class CoreController extends AbstractController {
 		}
 
 		// Serialize the whole lot
-		$response_data = $serializer->serialize( [ 'status' => 'OK', $this->singluar_name => $object ], 'json', ['groups' => 'admin' ] );
+		$response_data = $serializer->serialize( [ 'status' => 'OK', $this->singluar_name => $object ], 'json', ['groups' => $this->result_group ] );
 
 		return new JsonResponse( $response_data, 200, [], true );
 		//return new JsonResponse( [ $this->singluar_name => $object ] );
