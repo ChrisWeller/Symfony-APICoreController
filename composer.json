@@ -1,8 +1,8 @@
 {
-  "name": "designcomputing5/symfony-apicorecontroller",
+  "name": "primesoftwaredevelopment/symfony-apicorecontroller",
   "autoload": {
 	"psr-4": {
-	  "DesignComputing\\Controller\\": "src"
+	  "PrimeSoftware\\Controller\\": "src"
 	}
   }
 }
