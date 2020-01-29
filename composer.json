@@ -1,5 +1,7 @@
 {
   "name": "primesoftwaredevelopment/symfony-apicorecontroller",
+  "type": "library",
+  "license": "proprietary",
   "autoload": {
 	"psr-4": {
 	  "PrimeSoftware\\Controller\\": "src"
