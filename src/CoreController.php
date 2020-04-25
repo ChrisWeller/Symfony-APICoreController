@@ -4,6 +4,9 @@ namespace PrimeSoftware\Controller;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\Forms;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -45,7 +48,13 @@ abstract class CoreController extends AbstractController {
 	/**
 	 * @var SerializerInterface
 	 */
-	private $serializer;
+	protected $serializer;
+
+	/**
+	 * Whether this is being access via the api or 'old fashioned' html forms
+	 * @var bool
+	 */
+	protected $is_api = false;
 
 	public function __construct( EntityManagerInterface $em, SerializerInterface $serializer ) {
 		$this->em = $em;
@@ -57,13 +66,21 @@ abstract class CoreController extends AbstractController {
 	 * @return Response
 	 */
 	public function search( Request $request ) {
+		$this->is_api = !empty( $request->headers->get( 'X-AUTH') );
 
 		$objects = $this->_realSearch( $request );
 
-		$response_data = $this->serializer->serialize( [ 'status' => 'OK', $this->plural_name => $objects ], 'json', ['groups' => $this->result_group ] );
+		if ( $this->is_api ) {
+			$response_data = $this->serializer->serialize( [ 'status' => 'OK', $this->plural_name => $objects ], 'json', [ 'groups' => $this->result_group ] );
 
-		return new JsonResponse( $response_data, 200, [], true );
-		//return new JsonResponse( [ $this->plural_name => $objects ] );
+			return new JsonResponse( $response_data, 200, [], true );
+		}
+		else {
+			$this->twigData[ 'results' ] = $objects;
+			$this->postSearchData( $objects );
+
+			return $this->render( $this->template_path . '/search.html.twig', $this->twigData );
+		}
 	}
 
 	/**
@@ -76,7 +93,8 @@ abstract class CoreController extends AbstractController {
 	 * @Route("/{id}", methods={"GET"}, requirements={"id"="\d+"})
 	 * @return Response
 	 */
-	public function welcome( SerializerInterface $serializer, $id ) {
+	public function welcome( Request $request, SerializerInterface $serializer, $id ) {
+		$this->is_api = !empty( $request->headers->get( 'X-AUTH') );
 
 		// Strip anything that isn't a number
 		$id = preg_replace( '/[^0-9]/', '', $id );
@@ -84,16 +102,24 @@ abstract class CoreController extends AbstractController {
 		// Get the object
 		$object = $this->getObject( $id );
 
-		// If there is no object
-		if ( $object == null ) {
-			return new JsonResponse( [ 'status' => 'Fail', 404 ] );
+		if ( $this->is_api ) {
+			// If there is no object
+			if ( $object == null ) {
+				return new JsonResponse( [ 'status' => 'Fail', 404 ] );
+			}
+
+			// Serialize the whole lot
+			$response_data = $serializer->serialize( [ 'status' => 'OK', $this->singluar_name => $object ], 'json', [ 'groups' => $this->result_group ] );
+
+			return new JsonResponse( $response_data, 200, [], true );
 		}
+		else {
+			$form = $this->createForm( $this->manageFormClass, $object );
+			$this->twigData[ 'page' ][ 'form' ] = $form->createView();
+			$this->twigData[ 'object' ] = $object;
 
-		// Serialize the whole lot
-		$response_data = $serializer->serialize( [ 'status' => 'OK', $this->singluar_name => $object ], 'json', ['groups' => $this->result_group ] );
-
-		return new JsonResponse( $response_data, 200, [], true );
-		//return new JsonResponse( [ $this->singluar_name => $object ] );
+			return $this->render( $this->template_path . '/manage.html.twig', $this->twigData );
+		}
 	}
 
 	/**
@@ -101,6 +127,8 @@ abstract class CoreController extends AbstractController {
 	 * @return Response
 	 */
 	public function create( Request $request ) {
+		$this->is_api = !empty( $request->headers->get( 'X-AUTH') );
+
 		return $this->_store( $request );
 	}
 
@@ -109,6 +137,8 @@ abstract class CoreController extends AbstractController {
 	 * @return Response
 	 */
 	public function save( Request $request, $id ) {
+		$this->is_api = !empty( $request->headers->get( 'X-AUTH') );
+
 		return $this->_store( $request, $id );
 	}
 
@@ -126,9 +156,23 @@ abstract class CoreController extends AbstractController {
 		else {
 			$object = new $this->object_class();
 		}
-		$form = $this->createForm( $this->form_class, $object );
 
-		$form->submit( $request->request->all(), false );
+		$form = $this->createForm( $this->form_class, $object );
+		$content = $request->getContent();
+
+		if ( $this->is_api ) {
+			// Data received via json - so decode content
+			$data = json_decode(
+				$request->getContent(),
+				true
+			);
+
+			$form->submit( $data, false );
+		}
+		else {
+			// Must be posted via standard form
+			$form->handleRequest( $request );
+		}
 
 		// If the form is valid
 		if ( $form->isValid() ) {
@@ -171,5 +215,81 @@ abstract class CoreController extends AbstractController {
 	 */
 	protected function getObject( $id ) {
 		return $this->em->find( $this->object_class, $id );
+	}
+
+	/**
+	 * Path to templates
+	 * @var string
+	 */
+	protected $template_path;
+
+	/**
+	 * Data to pass to twig
+	 * @var array
+	 */
+	protected $twigData = [];
+
+	/**
+	 * Holds the search form
+	 * @var string
+	 */
+	protected $searchFormClass = '';
+
+	/**
+	 * Holds the management form
+	 * @var string
+	 */
+	protected $manageFormClass = '';
+
+	/**
+	 * @Route("/index")
+	 * @param Request $request
+	 */
+	public function mainIndex( Request $request ) {
+		$this->twigData[ 'page' ][ 'subpage' ] = false;
+		return $this->allIndex( $request );
+	}
+
+	/**
+	 * @Route("/subindex")
+	 * @param Request $request
+	 */
+	public function subIndex( Request $request ) {
+		$this->twigData[ 'page' ][ 'subpage' ] = true;
+		return $this->allIndex( $request );
+	}
+
+	/**
+	 * Actually renders the twig template (with additional data if required)
+	 * @param Request $request
+	 * @return Response
+	 */
+	private function allIndex( Request $request ) {
+		// Note if the page is a manage page
+		$this->twigData[ 'page' ][ 'manage' ] = false;
+
+		// Get the search data added to the array
+		$this->retrieveSearchData();
+
+		$form = $this->createForm( $this->searchFormClass );
+		$this->twigData[ 'page' ][ 'form' ] = $form->createView();
+
+		// Render the template
+		return $this->render( $this->template_path . '/index.html.twig', $this->twigData );
+	}
+
+	/**
+	 * Adds additional data to the twig data array for the search screen
+	 */
+	protected function retrieveSearchData() {
+
+	}
+
+	/**
+	 * Add additional data to the twid data array for the post search
+	 * @param $objects
+	 */
+	protected function postSearchData( $objects ) {
+
 	}
 }
