@@ -90,10 +90,10 @@ abstract class CoreController extends AbstractController {
 	protected abstract function _realSearch( Request $request );
 
 	/**
-	 * @Route("/{id}", methods={"GET"}, requirements={"id"="\d+"})
+	 * @Route("/{id<\d+>}/{subpage<\d+>}", methods={"GET"})
 	 * @return Response
 	 */
-	public function welcome( Request $request, SerializerInterface $serializer, $id ) {
+	public function welcome( Request $request, SerializerInterface $serializer, int $id, $subpage = 0) {
 		$this->is_api = !empty( $request->headers->get( 'X-AUTH') );
 
 		// Strip anything that isn't a number
@@ -114,8 +114,12 @@ abstract class CoreController extends AbstractController {
 			return new JsonResponse( $response_data, 200, [], true );
 		}
 		else {
+			if ( $object === null ) {
+				$object = new $this->object_class();
+			}
 			$form = $this->createForm( $this->manageFormClass, $object );
 			$this->twigData[ 'page' ][ 'form' ] = $form->createView();
+			$this->twigData[ 'page' ][ 'subpage' ] = $subpage == 1;
 			$this->twigData[ 'object' ] = $object;
 
 			return $this->render( $this->template_path . '/manage.html.twig', $this->twigData );
@@ -202,7 +206,7 @@ abstract class CoreController extends AbstractController {
 		$this->em->flush();
 
 		// Serialize the whole lot
-		$response_data = $this->serializer->serialize( [ 'status' => 'OK', $this->singluar_name => $object ], 'json', ['groups' => $this->result_group ] );
+		$response_data = $this->serializer->serialize( [ 'status' => 'OK', 'id' => $object->getId(), $this->singluar_name => $object ], 'json', ['groups' => $this->result_group ] );
 
 		// Return success :-)
 		return new JsonResponse( $response_data, 200, [], true );
@@ -267,6 +271,7 @@ abstract class CoreController extends AbstractController {
 	private function allIndex( Request $request ) {
 		// Note if the page is a manage page
 		$this->twigData[ 'page' ][ 'manage' ] = false;
+		$this->twigData[ 'page' ][ 'subpage' ] = 0;
 
 		// Get the search data added to the array
 		$this->retrieveSearchData();
