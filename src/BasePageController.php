@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping\Entity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -104,7 +105,7 @@ abstract class BasePageController extends AbstractController {
 	#endregion
 
 	#region Search - run search
-	protected function _runSearch( Request $request, $parentEntity = null ) {
+	protected function getSearchForm( $request ) {
 		$this->updateIsApi($request);
 
 		// Build the search form
@@ -125,6 +126,12 @@ abstract class BasePageController extends AbstractController {
 			// Handle the request
 			$form->handleRequest( $request );
 		}
+
+		return $form;
+	}
+
+	protected function _runSearch( Request $request, $parentEntity = null ) {
+		$form = $this->getSearchForm( $request );
 
 		// Actually run the search
 		$objects = $this->_realSearch( $request, $form, $parentEntity );
@@ -310,7 +317,7 @@ abstract class BasePageController extends AbstractController {
 	#endregion
 
 	#region Support Functions
-	private function updateIsApi( Request $request ) {
+	protected function updateIsApi( Request $request ) {
 		$this->is_api = !empty( $request->headers->get( 'X-AUTH-TOKEN') );
 	}
 
