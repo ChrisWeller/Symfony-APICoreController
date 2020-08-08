@@ -221,10 +221,10 @@ abstract class BasePageController extends AbstractController {
 	 * @Route("/create", methods={"POST"})
 	 * @return Response
 	 */
-	public function create( Request $request ) {
+	public function create( Request $request, $parent_id = null ) {
 		$this->updateIsApi($request);
 
-		return $this->_store( $request );
+		return $this->_store( $request, $parent_id );
 	}
 
 	/**
@@ -243,7 +243,7 @@ abstract class BasePageController extends AbstractController {
 	 * @param null $id
 	 * @return JsonResponse
 	 */
-	private function _store( Request $request, $id = null ) {
+	protected function _store( Request $request, $id = null, $parent_id = null ) {
 
 		if ( $id ) {
 			$object = $this->getObject( $id );
@@ -272,7 +272,7 @@ abstract class BasePageController extends AbstractController {
 		if ( $form->isSubmitted() && $form->isValid() ) {
 
 			// Call the post save function
-			$this->_postSaveObject( $object, ( $this->is_api ? $data : $request ) );
+			$this->_postSaveObject( $object, ( $this->is_api ? $data : $request ), $parent_id );
 
 			return $this->_saveObject( $object );
 		}
@@ -311,7 +311,7 @@ abstract class BasePageController extends AbstractController {
 	 * @param $object Entity
 	 * @param $data Request
 	 */
-	protected function _postSaveObject( $object, $data ) {
+	protected function _postSaveObject( $object, $data, $parent_id = null ) {
 
 	}
 	#endregion

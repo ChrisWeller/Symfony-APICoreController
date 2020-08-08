@@ -61,6 +61,18 @@ abstract class SubPageController extends BasePageController {
 	}
 	#endregion
 
+	#region Save
+	/**
+	 * @Route("/create", methods={"POST"})
+	 * @return Response
+	 */
+	public function create( Request $request, $parent_id = null ) {
+		$this->updateIsApi($request);
+
+		return $this->_store( $request, null, $parent_id );
+	}
+	#endregion
+
 	#region Support functions
 	/**
 	 * Get the individual item
