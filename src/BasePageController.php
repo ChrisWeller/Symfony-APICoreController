@@ -93,7 +93,7 @@ abstract class BasePageController extends AbstractController {
 		$this->twigData[ 'page' ][ 'form' ] = $form->createView();
 
 		// Render the template
-		return $this->render( $this->template_path . '/index.html.twig', $this->twigData );
+		return $this->renderTwig( $this->template_path . '/index.html.twig', $this->twigData );
 	}
 
 	/**
@@ -145,7 +145,7 @@ abstract class BasePageController extends AbstractController {
 			$this->twigData[ 'results' ] = $objects;
 			$this->postSearchData( $objects, $parentEntity );
 
-			return $this->render( $this->template_path . '/search.html.twig', $this->twigData );
+			return $this->renderTwig( $this->template_path . '/search.html.twig', $this->twigData );
 		}
 	}
 
@@ -199,7 +199,7 @@ abstract class BasePageController extends AbstractController {
 
 			$this->_getAdditionalManageData( $object );
 
-			return $this->render( $this->template_path . '/manage.html.twig', $this->twigData );
+			return $this->renderTwig( $this->template_path . '/manage.html.twig', $this->twigData );
 		}
 	}
 
@@ -328,6 +328,21 @@ abstract class BasePageController extends AbstractController {
 	 */
 	protected function getObject( $id ) {
 		return $this->em->find( $this->object_class, $id );
+	}
+
+	protected function renderTwig( $template, $data ) {
+		// Allow the addition of additional data if requried
+		$data = $this->preRenderTwig( $data );
+		// Render the twig template
+		return $this->render( $template, $data );
+	}
+
+	/**
+	 * @param $data
+	 * @return mixed
+	 */
+	protected function preRenderTwig( $data ) {
+		return $data;
 	}
 	#endregion
 }
