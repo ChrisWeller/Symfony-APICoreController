@@ -66,7 +66,7 @@ abstract class SubPageController extends BasePageController {
 	 * @Route("/create", methods={"POST"})
 	 * @return Response
 	 */
-	public function create( Request $request, $parent_id = null ) {
+	public function create( Request $request, $parentId = null ) {
 		$this->updateIsApi($request);
 
 		return $this->_store( $request, null, $parent_id );
