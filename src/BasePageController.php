@@ -144,12 +144,15 @@ abstract class BasePageController extends AbstractController {
 			return new JsonResponse( $response_data, 200, [], true );
 		}
 		else {
+			$excelExport = $form->has( 'export' ) && $form->get( 'export' )->getData();
+
 			$this->twigData[ 'results' ] = $objects;
+			$this->twigData[ 'Export' ] = $excelExport;
 			$this->postSearchData( $objects, $parentEntity );
 
 			$htmlResponse = $this->renderTwig( $this->template_path . '/search.html.twig', $this->twigData );
 
-			if ( $form->has( 'export' ) && $form->get( 'export' )->getData() ) {
+			if ( $excelExport ) {
 				$html = $htmlResponse->getContent();
 
 				$filename = tempnam(sys_get_temp_dir(), "report");
