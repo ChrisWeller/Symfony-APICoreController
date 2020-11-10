@@ -4,8 +4,10 @@ namespace PrimeSoftware\Controller;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Entity;
+use PrimeSoftware\Service\Excel\Excel;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -145,7 +147,25 @@ abstract class BasePageController extends AbstractController {
 			$this->twigData[ 'results' ] = $objects;
 			$this->postSearchData( $objects, $parentEntity );
 
-			return $this->renderTwig( $this->template_path . '/search.html.twig', $this->twigData );
+			$htmlResponse = $this->renderTwig( $this->template_path . '/search.html.twig', $this->twigData );
+
+			if ( $form->has( 'export' ) && $form->get( 'export' )->getData() ) {
+				$html = $htmlResponse->getContent();
+
+				$filename = tempnam(sys_get_temp_dir(), "report");
+				$excelFile = new Excel();
+				$excelFile->setAuthor( $this->getUser()->getUsername() )
+					->setCompany( 'Software' )
+					->setDescription( 'Software' );
+
+				$excelFile->loadFromHTML( $html );
+				$excelFile->create( $filename, 'Software' );
+
+				return new BinaryFileResponse( $filename );
+			}
+			else {
+				return $htmlResponse;
+			}
 		}
 	}
 
@@ -272,7 +292,11 @@ abstract class BasePageController extends AbstractController {
 		if ( $form->isSubmitted() && $form->isValid() ) {
 
 			// Call the post save function
-			$this->_postSaveObject( $object, ( $this->is_api ? $data : $request ), $parent_id );
+			$postSaveResult = $this->_postSaveObject( $object, ( $this->is_api ? $data : $request ), $parent_id );
+
+			if ( $postSaveResult !== true ) {
+				return new JsonResponse( [ "status" => "Fail", "notes" => ( $postSaveResult === false ? "Unable to store" : $postSaveResult ) ] );
+			}
 
 			return $this->_saveObject( $object );
 		}
@@ -312,7 +336,7 @@ abstract class BasePageController extends AbstractController {
 	 * @param $data Request
 	 */
 	protected function _postSaveObject( $object, $data, $parent_id = null ) {
-
+		return true;
 	}
 	#endregion
 
