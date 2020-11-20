@@ -69,7 +69,7 @@ abstract class SubPageController extends BasePageController {
 	public function create( Request $request, $parentId = null ) {
 		$this->updateIsApi($request);
 
-		return $this->_store( $request, null, $parent_id );
+		return $this->_store( $request, null, $parentId );
 	}
 	#endregion
 
