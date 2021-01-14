@@ -220,17 +220,17 @@ abstract class BasePageController extends AbstractController {
 			$this->twigData[ 'parent' ] = $parentEntity;
 			$this->twigData[ 'object' ] = $object;
 
-			$this->_getAdditionalManageData( $object );
+			$this->_getAdditionalManageData( $object, $parentEntity );
 
 			return $this->renderTwig( $this->template_path . '/manage.html.twig', $this->twigData );
 		}
 	}
 
-	protected function _getAdditionalManageData( $object ) {
+	protected function _getAdditionalManageData( $object, $parentEntity = null ) {
 
 	}
 
-	protected function _preCreateForm( $object ) {
+	protected function _preCreateForm( $object, $parentEntity = null ) {
 
 	}
 
@@ -294,6 +294,8 @@ abstract class BasePageController extends AbstractController {
 		// If the form is valid
 		if ( $form->isSubmitted() && $form->isValid() ) {
 
+			$this->_handleExtraFormData( $object, $form, ( $this->is_api ? $data : $request ), $parent_id );
+
 			// Call the post save function
 			$postSaveResult = $this->_postSaveObject( $object, ( $this->is_api ? $data : $request ), $parent_id );
 
@@ -332,6 +334,14 @@ abstract class BasePageController extends AbstractController {
 
 		// Return success :-)
 		return new JsonResponse( $response_data, 200, [], true );
+	}
+
+	/**
+	 * @param $object Entity
+	 * @param $data Request
+	 */
+	protected function _handleExtraFormData( $object, $form, $data, $parent_id = null ) {
+		return true;
 	}
 
 	/**
