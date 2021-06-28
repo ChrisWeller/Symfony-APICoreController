@@ -329,8 +329,12 @@ abstract class BasePageController extends AbstractController {
 		// Flush the data to the database
 		$this->em->flush();
 
+		$meta = $this->em->getClassMetadata( $this->object_class );
+		$primaryKeyName = $meta->getSingleIdentifierFieldName();
+		$primaryKeyGetFunc = "get" . $primaryKeyName;
+
 		// Serialize the whole lot
-		$response_data = $this->serializer->serialize( [ 'status' => 'OK', 'id' => $object->getId(), $this->singluar_name => $object ], 'json', ['groups' => $this->result_group ] );
+		$response_data = $this->serializer->serialize( [ 'status' => 'OK', 'id' => $object->$primaryKeyGetFunc(), $this->singluar_name => $object ], 'json', ['groups' => $this->result_group ] );
 
 		// Return success :-)
 		return new JsonResponse( $response_data, 200, [], true );
