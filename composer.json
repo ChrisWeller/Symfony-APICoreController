@@ -9,7 +9,7 @@
     }
   ],
   "require": {
-    "primesoftwaredevelopment/symfony-excel": "^0.02"
+    "primesoftwaredevelopment/symfony-excel": "*"
   },
   "autoload": {
 	"psr-4": {
