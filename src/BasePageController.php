@@ -63,6 +63,18 @@ abstract class BasePageController extends AbstractController {
 	protected $manageFormClass = '';
 
 	/**
+	 * Holds the code to check before access to the page is allowed
+	 * @var null
+	 */
+	protected $pageCode = null;
+
+	/**
+	 * Holds if we're being access via an API call or GUI call
+	 * @var bool
+	 */
+	private $is_api = false;
+
+	/**
 	 * PageController constructor.
 	 * @param EntityManagerInterface $em
 	 * @param SerializerInterface $serializer
@@ -81,6 +93,11 @@ abstract class BasePageController extends AbstractController {
 	 */
 	protected function allIndex( Request $request, $subpage = false, $parentEntity = null ) {
 		$this->updateIsApi($request);
+
+		$passSecurityCheck = $this->securityCheck();
+		if ($passSecurityCheck !== true) {
+			return $passSecurityCheck;
+		}
 
 		// Note if the page is a manage page
 		$this->twigData[ 'page' ][ 'manage' ] = false;
@@ -107,7 +124,11 @@ abstract class BasePageController extends AbstractController {
 	#endregion
 
 	#region Search - run search
-	protected function getSearchForm( $request ) {
+	/**
+	 * @param $request
+	 * @return Form
+	 */
+	protected function getSearchForm( $request ) : Form {
 		$this->updateIsApi($request);
 
 		// Build the search form
@@ -132,7 +153,19 @@ abstract class BasePageController extends AbstractController {
 		return $form;
 	}
 
-	protected function _runSearch( Request $request, $parentEntity = null ) {
+	/**
+	 * @param Request $request
+	 * @param $parentEntity
+	 * @return Response
+	 */
+	protected function _runSearch( Request $request, $parentEntity = null ) : Response {
+		$this->updateIsApi($request);
+
+		$passSecurityCheck = $this->securityCheck();
+		if ($passSecurityCheck !== true) {
+			return $passSecurityCheck;
+		}
+
 		$form = $this->getSearchForm( $request );
 
 		// Actually run the search
@@ -188,8 +221,20 @@ abstract class BasePageController extends AbstractController {
 	#endregion
 
 	#region Manage
-	protected function allWelcome( Request $request, $id, $subpage = false, $parentEntity = null ) {
+	/**
+	 * @param Request $request
+	 * @param $id
+	 * @param $subpage
+	 * @param $parentEntity
+	 * @return Response
+	 */
+	protected function allWelcome( Request $request, $id, $subpage = false, $parentEntity = null ) : Response {
 		$this->updateIsApi($request);
+
+		$passSecurityCheck = $this->securityCheck();
+		if ($passSecurityCheck !== true) {
+			return $passSecurityCheck;
+		}
 
 		// Strip anything that isn't a number
 		$id = preg_replace( '/[^0-9]/', '', $id );
@@ -242,9 +287,9 @@ abstract class BasePageController extends AbstractController {
 	#region Save
 	/**
 	 * @Route("/create", methods={"POST"})
-	 * @return Response
+	 * @return JsonResponse
 	 */
-	public function create( Request $request, $parent_id = null ) {
+	public function create( Request $request, $parent_id = null ) : JsonResponse {
 		$this->updateIsApi($request);
 
 		return $this->_store( $request, $parent_id );
@@ -252,9 +297,9 @@ abstract class BasePageController extends AbstractController {
 
 	/**
 	 * @Route("/{id}", methods={"POST"}, requirements={"id"="\d+"})
-	 * @return Response
+	 * @return JsonResponse
 	 */
-	public function save( Request $request, $id ) {
+	public function save( Request $request, $id ) : JsonResponse {
 		$this->updateIsApi($request);
 
 		return $this->_store( $request, $id );
@@ -266,7 +311,7 @@ abstract class BasePageController extends AbstractController {
 	 * @param null $id
 	 * @return JsonResponse
 	 */
-	protected function _store( Request $request, $id = null, $parent_id = null ) {
+	protected function _store( Request $request, $id = null, $parent_id = null ) : JsonResponse {
 
 		if ( $id ) {
 			$object = $this->getObject( $id );
@@ -322,7 +367,7 @@ abstract class BasePageController extends AbstractController {
 	 * @param $object
 	 * @return JsonResponse
 	 */
-	protected function _saveObject( $object ) {
+	protected function _saveObject( $object ) : JsonResponse {
 		// Persist the data
 		$this->em->persist( $object );
 
@@ -343,23 +388,39 @@ abstract class BasePageController extends AbstractController {
 	/**
 	 * @param $object Entity
 	 * @param $data Request
+	 * @return bool
 	 */
-	protected function _handleExtraFormData( $object, $form, $data, $parent_id = null ) {
+	protected function _handleExtraFormData( $object, $form, $data, $parent_id = null ) : bool {
 		return true;
 	}
 
 	/**
 	 * @param $object Entity
 	 * @param $data Request
+	 * @return bool
 	 */
-	protected function _postSaveObject( $object, $data, $parent_id = null ) {
+	protected function _postSaveObject( $object, $data, $parent_id = null ) : bool {
 		return true;
 	}
 	#endregion
 
 	#region Support Functions
+	/**
+	 * Updates whether this is an API call or not
+	 * @param Request $request
+	 * @return void
+	 */
 	protected function updateIsApi( Request $request ) {
 		$this->is_api = !empty( $request->headers->get( 'X-AUTH-TOKEN') );
+	}
+
+	/**
+	 * Retrieves if we've been called by an API call or through a UI call
+	 * @return bool
+	 */
+	protected function getIsApi() : bool
+	{
+		return $this->is_api;
 	}
 
 	/**
@@ -367,11 +428,17 @@ abstract class BasePageController extends AbstractController {
 	 * @param $id
 	 * @return mixed
 	 */
-	protected function getObject( $id ) {
+	protected function getObject( $id ) : mixed {
 		return $this->em->find( $this->object_class, $id );
 	}
 
-	protected function renderTwig( $template, $data ) {
+	/**
+	 * Renders the twig template
+	 * @param $template
+	 * @param $data
+	 * @return string
+	 */
+	protected function renderTwig( $template, $data ) : Response {
 		// Allow the addition of additional data if requried
 		$data = $this->preRenderTwig( $data );
 		// Render the twig template
@@ -384,6 +451,15 @@ abstract class BasePageController extends AbstractController {
 	 */
 	protected function preRenderTwig( $data ) {
 		return $data;
+	}
+
+	/**
+	 * Overridable - runs security checks
+	 * @return bool
+	 */
+	protected function securityCheck() : bool
+	{
+		return true;
 	}
 	#endregion
 }

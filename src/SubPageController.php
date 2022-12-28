@@ -4,6 +4,7 @@ namespace PrimeSoftware\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
 abstract class SubPageController extends BasePageController {
@@ -66,7 +67,7 @@ abstract class SubPageController extends BasePageController {
 	 * @Route("/create", methods={"POST"})
 	 * @return Response
 	 */
-	public function create( Request $request, $parentId = null ) {
+	public function create( Request $request, $parentId = null ) : JsonResponse {
 		$this->updateIsApi($request);
 
 		return $this->_store( $request, null, $parentId );
