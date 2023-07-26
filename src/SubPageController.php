@@ -19,6 +19,7 @@ abstract class SubPageController extends BasePageController {
 	 * @param Request $request
 	 * @return Response
 	 */
+	#[Route("/",methods:["GET"])]
 	public function mainIndex( Request $request, int $parentId ) {
 		return $this->allIndex( $request, false, $this->getParentObject( $parentId ) );
 	}
@@ -28,6 +29,7 @@ abstract class SubPageController extends BasePageController {
 	 * @param Request $request
 	 * @return Response
 	 */
+	#[Route("/subindex/",methods:["GET"])]
 	public function subIndex( Request $request, $parentId ) {
 		return $this->allIndex( $request, true, $this->getParentObject( $parentId ) );
 	}
@@ -38,6 +40,7 @@ abstract class SubPageController extends BasePageController {
 	 * @Route("/search/", methods={"GET","POST"})
 	 * @return Response
 	 */
+	#[Route("/search/",methods:["GET","POST"])]
 	public function search( Request $request, $parentId ) {
 		return $this->_runSearch( $request, $this->getParentObject( $parentId ) );
 	}
@@ -48,6 +51,7 @@ abstract class SubPageController extends BasePageController {
 	 * @Route("/{id<\d+>}", methods={"GET"})
 	 * @return Response
 	 */
+	#[Route("/{id<\d+>}",methods:["GET"])]
 	public function welcome( Request $request, $id, $parentId ) {
 		return $this->allWelcome( $request, $id, false, $this->getParentObject( $parentId ) );
 	}
@@ -56,6 +60,7 @@ abstract class SubPageController extends BasePageController {
 	 * @Route("/subwelcome/{id<\d+>}", methods={"GET"})
 	 * @return Response
 	 */
+	#[Route("/subwelcome/{id<\d+>}",methods:["GET"])]
 	public function subWelcome( Request $request, $id, $parentId ) {
 		return $this->allWelcome( $request, $id, true, $this->getParentObject( $parentId ) );
 	}
@@ -66,6 +71,7 @@ abstract class SubPageController extends BasePageController {
 	 * @Route("/create", methods={"POST"})
 	 * @return Response
 	 */
+	#[Route("/create",methods:["POST"])]
 	public function create( Request $request, $parentId = null ) {
 		$this->updateIsApi($request);
 

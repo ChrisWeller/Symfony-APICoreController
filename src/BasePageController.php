@@ -244,6 +244,7 @@ abstract class BasePageController extends AbstractController {
 	 * @Route("/create", methods={"POST"})
 	 * @return Response
 	 */
+	#[Route("/create",methods:["POST"])]
 	public function create( Request $request, $parent_id = null ) {
 		$this->updateIsApi($request);
 
@@ -254,6 +255,7 @@ abstract class BasePageController extends AbstractController {
 	 * @Route("/{id}", methods={"POST"}, requirements={"id"="\d+"})
 	 * @return Response
 	 */
+	#[Route("/{id<\d+>}",methods:["POST"])]
 	public function save( Request $request, $id ) {
 		$this->updateIsApi($request);
 

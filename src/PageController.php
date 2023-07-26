@@ -19,6 +19,7 @@ abstract class PageController extends BasePageController {
 	 * @param Request $request
 	 * @return Response
 	 */
+	#[Route("/",methods:["GET"])]
 	public function mainIndex( Request $request ) {
 		return $this->allIndex( $request, false );
 	}
@@ -28,6 +29,7 @@ abstract class PageController extends BasePageController {
 	 * @param Request $request
 	 * @return Response
 	 */
+	#[Route("/subindex/",methods:["GET"])]
 	public function subIndex( Request $request ) {
 		return $this->allIndex( $request, true );
 	}
@@ -38,6 +40,7 @@ abstract class PageController extends BasePageController {
 	 * @Route("/search/", methods={"GET","POST"})
 	 * @return Response
 	 */
+	#[Route("/search/",methods:["GET","POST"])]
 	public function search( Request $request ) {
 		return $this->_runSearch( $request );
 	}
@@ -48,6 +51,7 @@ abstract class PageController extends BasePageController {
 	 * @Route("/{id<\d+>}", methods={"GET"})
 	 * @return Response
 	 */
+	#[Route("/{id<\d+>}",methods:["GET"])]
 	public function welcome( Request $request, int $id ) {
 		return $this->allWelcome( $request, $id );
 	}
@@ -56,6 +60,7 @@ abstract class PageController extends BasePageController {
 	 * @Route("/subwelcome/{id<\d+>}", methods={"GET"})
 	 * @return Response
 	 */
+	#[Route("/subwelcome/{id<\d+>}",methods:["GET"])]
 	public function subWelcome( Request $request, $id ) {
 		return $this->allWelcome( $request, $id, true );
 	}

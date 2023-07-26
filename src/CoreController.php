@@ -65,6 +65,7 @@ abstract class CoreController extends AbstractController {
 	 * @Route("/search/", methods={"GET"})
 	 * @return Response
 	 */
+	#[Route("/search/",methods:["GET"])]
 	public function search( Request $request ) {
 		$this->is_api = !empty( $request->headers->get( 'X-AUTH') );
 
@@ -93,6 +94,7 @@ abstract class CoreController extends AbstractController {
 	 * @Route("/{id<\d+>}/{subpage<\d+>}", methods={"GET"})
 	 * @return Response
 	 */
+	#[Route("/{id<\d+>}/{subpage<\d+>}",methods:["GET"])]
 	public function welcome( Request $request, SerializerInterface $serializer, int $id, $subpage = 0) {
 		$this->is_api = !empty( $request->headers->get( 'X-AUTH') );
 
@@ -130,6 +132,7 @@ abstract class CoreController extends AbstractController {
 	 * @Route("/create", methods={"POST"})
 	 * @return Response
 	 */
+	#[Route("/create",methods:["POST"])]
 	public function create( Request $request ) {
 		$this->is_api = !empty( $request->headers->get( 'X-AUTH') );
 
@@ -140,6 +143,7 @@ abstract class CoreController extends AbstractController {
 	 * @Route("/save/{id}", methods={"POST"}, requirements={"id"="\d+"})
 	 * @return Response
 	 */
+	#[Route("/save/{id<\d+>}",methods:["POST"])]
 	public function save( Request $request, $id ) {
 		$this->is_api = !empty( $request->headers->get( 'X-AUTH') );
 
@@ -249,6 +253,7 @@ abstract class CoreController extends AbstractController {
 	 * @Route("/index")
 	 * @param Request $request
 	 */
+	#[Route("/index")]
 	public function mainIndex( Request $request ) {
 		$this->twigData[ 'page' ][ 'subpage' ] = false;
 		return $this->allIndex( $request );
@@ -258,6 +263,7 @@ abstract class CoreController extends AbstractController {
 	 * @Route("/subindex")
 	 * @param Request $request
 	 */
+	#[Route("/subindex")]
 	public function subIndex( Request $request ) {
 		$this->twigData[ 'page' ][ 'subpage' ] = true;
 		return $this->allIndex( $request );
