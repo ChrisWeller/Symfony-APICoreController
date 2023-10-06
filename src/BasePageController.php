@@ -457,7 +457,7 @@ abstract class BasePageController extends AbstractController {
 	 * Overridable - runs security checks
 	 * @return bool
 	 */
-	protected function securityCheck() : bool
+	protected function securityCheck() : bool|Response
 	{
 		return true;
 	}
