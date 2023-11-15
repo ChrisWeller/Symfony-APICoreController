@@ -99,6 +99,8 @@ abstract class BasePageController extends AbstractController {
 			return $passSecurityCheck;
 		}
 
+		$this->logAccess();
+
 		// Note if the page is a manage page
 		$this->twigData[ 'page' ][ 'manage' ] = false;
 		$this->twigData[ 'page' ][ 'subpage' ] = $subpage;
@@ -235,6 +237,8 @@ abstract class BasePageController extends AbstractController {
 		if ($passSecurityCheck !== true) {
 			return $passSecurityCheck;
 		}
+
+		$this->logAccess();
 
 		// Strip anything that isn't a number
 		$id = preg_replace( '/[^0-9]/', '', $id );
@@ -461,5 +465,7 @@ abstract class BasePageController extends AbstractController {
 	{
 		return true;
 	}
+
+	protected function logAccess() {}
 	#endregion
 }
