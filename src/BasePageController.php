@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 abstract class BasePageController extends AbstractController {
 
@@ -290,9 +290,9 @@ abstract class BasePageController extends AbstractController {
 
 	#region Save
 	/**
-	 * @Route("/create", methods={"POST"})
 	 * @return JsonResponse
 	 */
+    #[Route('/create', methods: ['POST'])]
 	public function create( Request $request, $parent_id = null ) : JsonResponse {
 		$this->updateIsApi($request);
 
@@ -300,9 +300,9 @@ abstract class BasePageController extends AbstractController {
 	}
 
 	/**
-	 * @Route("/{id}", methods={"POST"}, requirements={"id"="\d+"})
 	 * @return JsonResponse
 	 */
+    #[Route('/{id}', methods: ['POST'], requirements: ['id'=>'\d+'])]
 	public function save( Request $request, $id ) : JsonResponse {
 		$this->updateIsApi($request);
 

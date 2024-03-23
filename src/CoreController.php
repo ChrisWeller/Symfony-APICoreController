@@ -10,8 +10,8 @@ use Symfony\Component\Form\Forms;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Routing\Attribute\Route;
 
 abstract class CoreController extends AbstractController {
 
@@ -62,9 +62,9 @@ abstract class CoreController extends AbstractController {
 	}
 
 	/**
-	 * @Route("/search/", methods={"GET"})
 	 * @return Response
 	 */
+    #[Route('/search/', methods: ['GET'])]
 	public function search( Request $request ) {
 		$this->is_api = !empty( $request->headers->get( 'X-AUTH') );
 
@@ -90,9 +90,9 @@ abstract class CoreController extends AbstractController {
 	protected abstract function _realSearch( Request $request );
 
 	/**
-	 * @Route("/{id<\d+>}/{subpage<\d+>}", methods={"GET"})
 	 * @return Response
 	 */
+    #[Route('/{id}/{subpage}', methods: ['GET'], requirements: ['id'=>'\d+', 'subpage'=>'\d+'])]
 	public function welcome( Request $request, SerializerInterface $serializer, int $id, $subpage = 0) {
 		$this->is_api = !empty( $request->headers->get( 'X-AUTH') );
 
@@ -127,9 +127,9 @@ abstract class CoreController extends AbstractController {
 	}
 
 	/**
-	 * @Route("/create", methods={"POST"})
 	 * @return Response
 	 */
+    #[Route('/create', methods: ['POST'])]
 	public function create( Request $request ) {
 		$this->is_api = !empty( $request->headers->get( 'X-AUTH') );
 
@@ -137,9 +137,9 @@ abstract class CoreController extends AbstractController {
 	}
 
 	/**
-	 * @Route("/save/{id}", methods={"POST"}, requirements={"id"="\d+"})
 	 * @return Response
 	 */
+    #[Route('/save/{id}', methods: ['POST'], requirements: ['id'=>'\d+'])]
 	public function save( Request $request, $id ) {
 		$this->is_api = !empty( $request->headers->get( 'X-AUTH') );
 
@@ -246,18 +246,18 @@ abstract class CoreController extends AbstractController {
 	protected $manageFormClass = '';
 
 	/**
-	 * @Route("/index")
 	 * @param Request $request
 	 */
+    #[Route('/index', methods: ['GET'])]
 	public function mainIndex( Request $request ) {
 		$this->twigData[ 'page' ][ 'subpage' ] = false;
 		return $this->allIndex( $request );
 	}
 
 	/**
-	 * @Route("/subindex")
 	 * @param Request $request
 	 */
+    #[Route('/subindex', methods: ['GET'])]
 	public function subIndex( Request $request ) {
 		$this->twigData[ 'page' ][ 'subpage' ] = true;
 		return $this->allIndex( $request );

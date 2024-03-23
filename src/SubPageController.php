@@ -5,7 +5,7 @@ namespace PrimeSoftware\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 abstract class SubPageController extends BasePageController {
 
@@ -16,19 +16,19 @@ abstract class SubPageController extends BasePageController {
 
 	#region Main index section - search / home page
 	/**
-	 * @Route("/", methods={"GET"})
 	 * @param Request $request
 	 * @return Response
 	 */
+    #[Route('/', methods: ['GET'])]
 	public function mainIndex( Request $request, int $parentId ) {
 		return $this->allIndex( $request, false, $this->getParentObject( $parentId ) );
 	}
 
 	/**
-	 * @Route("/subindex/", methods={"GET"})
 	 * @param Request $request
 	 * @return Response
 	 */
+    #[Route('/subindex/', methods: ['GET'])]
 	public function subIndex( Request $request, $parentId ) {
 		return $this->allIndex( $request, true, $this->getParentObject( $parentId ) );
 	}
@@ -36,9 +36,9 @@ abstract class SubPageController extends BasePageController {
 
 	#region Search - run search
 	/**
-	 * @Route("/search/", methods={"GET","POST"})
 	 * @return Response
 	 */
+    #[Route('/search/', methods: ['GET', 'POST'])]
 	public function search( Request $request, $parentId ) {
 		return $this->_runSearch( $request, $this->getParentObject( $parentId ) );
 	}
@@ -46,17 +46,17 @@ abstract class SubPageController extends BasePageController {
 
 	#region Manage
 	/**
-	 * @Route("/{id<\d+>}", methods={"GET"})
 	 * @return Response
 	 */
+    #[Route('/{id}', methods: ['GET'], requirements: ['id'=>'\d+'])]
 	public function welcome( Request $request, $id, $parentId ) {
 		return $this->allWelcome( $request, $id, false, $this->getParentObject( $parentId ) );
 	}
 
 	/**
-	 * @Route("/subwelcome/{id<\d+>}", methods={"GET"})
 	 * @return Response
 	 */
+    #[Route('/subwelcome/{id}', methods: ['GET'], requirements: ['id'=>'\d+'])]
 	public function subWelcome( Request $request, $id, $parentId ) {
 		return $this->allWelcome( $request, $id, true, $this->getParentObject( $parentId ) );
 	}
@@ -64,9 +64,9 @@ abstract class SubPageController extends BasePageController {
 
 	#region Save
 	/**
-	 * @Route("/create", methods={"POST"})
 	 * @return Response
 	 */
+    #[Route('/create', methods: ['POST'])]
 	public function create( Request $request, $parentId = null ) : JsonResponse {
 		$this->updateIsApi($request);
 
