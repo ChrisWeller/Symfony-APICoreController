@@ -5,7 +5,7 @@
   "repositories": [
     {
       "type": "vcs",
-      "url": "https://github.com/Prime-Software-Development/symfony-excel"
+      "url": "https://github.com/Prime-Software-Development/symfony-apicorecontroller"
     }
   ],
   "require": {
