@@ -378,6 +378,8 @@ abstract class BasePageController extends AbstractController {
 		// Flush the data to the database
 		$this->em->flush();
 
+		$this->_postSavePreOutput( $object );
+
 		$meta = $this->em->getClassMetadata( $this->object_class );
 		$primaryKeyName = $meta->getSingleIdentifierFieldName();
 		$primaryKeyGetFunc = "get" . $primaryKeyName;
@@ -405,6 +407,14 @@ abstract class BasePageController extends AbstractController {
 	 */
 	protected function _postSaveObject( $object, $data, $parent_id = null ) : bool {
 		return true;
+	}
+
+	/**
+	 * @param $object
+	 * @return void
+	 */
+	protected function _postSavePreOutput( $object ) {
+
 	}
 	#endregion
 
