@@ -20,7 +20,7 @@ abstract class SubPageController extends BasePageController {
 	 * @return Response
 	 */
     #[Route('/', methods: ['GET'])]
-	public function mainIndex( Request $request, int $parentId ) {
+	public function mainIndex( Request $request, int $parentId = null ) {
 		return $this->allIndex( $request, false, $this->getParentObject( $parentId ) );
 	}
 
@@ -29,7 +29,7 @@ abstract class SubPageController extends BasePageController {
 	 * @return Response
 	 */
     #[Route('/subindex/', methods: ['GET'])]
-	public function subIndex( Request $request, $parentId ) {
+	public function subIndex( Request $request, $parentId = null ) {
 		return $this->allIndex( $request, true, $this->getParentObject( $parentId ) );
 	}
 	#endregion
@@ -39,7 +39,7 @@ abstract class SubPageController extends BasePageController {
 	 * @return Response
 	 */
     #[Route('/search/', methods: ['GET', 'POST'])]
-	public function search( Request $request, $parentId ) {
+	public function search( Request $request, $parentId = null ) {
 		return $this->_runSearch( $request, $this->getParentObject( $parentId ) );
 	}
 	#endregion
@@ -49,7 +49,7 @@ abstract class SubPageController extends BasePageController {
 	 * @return Response
 	 */
     #[Route('/{id}', methods: ['GET'], requirements: ['id'=>'\d+'])]
-	public function welcome( Request $request, $id, $parentId ) {
+	public function welcome( Request $request, $id, $parentId = null ) {
 		return $this->allWelcome( $request, $id, false, $this->getParentObject( $parentId ) );
 	}
 
@@ -57,7 +57,7 @@ abstract class SubPageController extends BasePageController {
 	 * @return Response
 	 */
     #[Route('/subwelcome/{id}', methods: ['GET'], requirements: ['id'=>'\d+'])]
-	public function subWelcome( Request $request, $id, $parentId ) {
+	public function subWelcome( Request $request, $id, $parentId = null ) {
 		return $this->allWelcome( $request, $id, true, $this->getParentObject( $parentId ) );
 	}
 	#endregion
@@ -81,6 +81,9 @@ abstract class SubPageController extends BasePageController {
 	 * @return mixed
 	 */
 	protected function getParentObject( $id ) {
+		if ( $id == null ) {
+			return null;
+		}
 		return $this->em->find( $this->parent_class, $id );
 	}
 	#endregion
