@@ -72,7 +72,7 @@ abstract class BasePageController extends AbstractController {
 	 * Holds if we're being access via an API call or GUI call
 	 * @var bool
 	 */
-	private $is_api = false;
+	protected $is_api = false;
 
 	/**
 	 * PageController constructor.
