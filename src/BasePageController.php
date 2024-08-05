@@ -192,12 +192,12 @@ abstract class BasePageController extends AbstractController {
 
 				$filename = tempnam(sys_get_temp_dir(), "report");
 				$excelFile = new Excel();
-				$excelFile->setAuthor( $this->getUser()->getUsername() )
-					->setCompany( 'Software' )
-					->setDescription( 'Software' );
+				$excelFile->setAuthor( $this->exportAuthor ?? $this->getUser()->getUsername() )
+					->setCompany( $this->exportCompany )
+					->setDescription( $this->exportDescription );
 
 				$excelFile->loadFromHTML( $html );
-				$excelFile->create( $filename, 'Software' );
+				$excelFile->create( $filename, $this->exportFilename );
 
 				return new BinaryFileResponse( $filename );
 			}
@@ -206,6 +206,19 @@ abstract class BasePageController extends AbstractController {
 			}
 		}
 	}
+
+    private $exportFilename = 'Software';
+    private $exportCompany = 'Software';
+    private $exportAuthor = null;
+    private $exportDescription = 'Software';
+
+    protected function setExportDetails( $filename, $company, $author, $description )
+    {
+        $this->exportFilename = $filename;
+        $this->exportCompany = $company;
+        $this->exportAuthor = $author;
+        $this->exportDescription = $description;
+    }
 
 	/**
 	 * @param Request $request
