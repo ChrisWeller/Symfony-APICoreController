@@ -418,7 +418,7 @@ abstract class BasePageController extends AbstractController {
 	 * @param $data Request
 	 * @return bool
 	 */
-	protected function _postSaveObject( $object, $data, $parent_id = null ) : bool {
+	protected function _postSaveObject( $object, $data, $parent_id = null ) : bool|string {
 		return true;
 	}
 
