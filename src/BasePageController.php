@@ -72,7 +72,7 @@ abstract class BasePageController extends AbstractController {
 	 * Holds if we're being access via an API call or GUI call
 	 * @var bool
 	 */
-	private $is_api = false;
+	protected $is_api = false;
 
 	/**
 	 * PageController constructor.
@@ -418,7 +418,7 @@ abstract class BasePageController extends AbstractController {
 	 * @param $data Request
 	 * @return bool
 	 */
-	protected function _postSaveObject( $object, $data, $parent_id = null ) : bool {
+	protected function _postSaveObject( $object, $data, $parent_id = null ) : bool|string {
 		return true;
 	}
 

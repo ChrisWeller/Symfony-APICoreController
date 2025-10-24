@@ -2,16 +2,6 @@
   "name": "primesoftwaredevelopment/symfony-apicorecontroller",
   "type": "library",
   "license": "proprietary",
-  "repositories": [
-    {
-      "type": "vcs",
-      "url": "https://github.com/Prime-Software-Development/symfony-apicorecontroller"
-    }
-  ],
-  "require": {
-    "php": ">=8.1.0",
-    "primesoftwaredevelopment/symfony-excel": "*"
-  },
   "autoload": {
 	"psr-4": {
 	  "PrimeSoftware\\Controller\\": "src"
